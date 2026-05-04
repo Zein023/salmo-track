@@ -149,7 +149,7 @@ export default function Dashboard() {
                 </div>
               </Card>
               <Card className="bg-[#525252] border-none text-white p-4 rounded-2xl flex flex-col justify-center">
-                <div className="text-sm font-semibold text-neutral-300 mb-2">Tegangan Listrik</div>
+                <div className="text-sm font-semibold text-neutral-300 mb-2">Tegangan Puncak</div>
                 <div className="text-4xl font-bold text-[#4ade80] flex items-baseline gap-1 mt-2">
                   {displayTegangan} <span className="text-xl font-bold text-white">V</span>
                 </div>
