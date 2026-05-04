@@ -6,7 +6,6 @@ export interface HistoryRecord {
   time: string;
   status: string;
   peakArus: number;
-  deltaI: number;
   description: string;
 }
 
@@ -77,22 +76,22 @@ export function useSensorData() {
           
           // Generate history record on transition to active states
           if (nextStatus === 'active-negative') {
+            const peakAman = (0.5 + Math.random() * 2.0).toFixed(2);
             setHistoryRecords(h => [{
               id: Date.now().toString(),
               time: new Date().toLocaleTimeString(),
               status: 'Aman',
-              peakArus: 33,
-              deltaI: 2,
-              description: 'Aman (Penurunan arus normal: 2 µA)'
+              peakArus: Number(peakAman),
+              description: `Aman (Arus stabil di titik rendah: ${peakAman} µA)`
             }, ...h]);
           } else if (nextStatus === 'active-positive') {
+            const peakBahaya = (15 + Math.random() * 20.0).toFixed(2);
             setHistoryRecords(h => [{
               id: Date.now().toString(),
               time: new Date().toLocaleTimeString(),
               status: 'Bahaya',
-              peakArus: 10,
-              deltaI: 25,
-              description: 'Bahaya! Arus drop drastis melebihi ambang batas (Delta: 25 µA)'
+              peakArus: Number(peakBahaya),
+              description: `Bahaya! Terjadi lonjakan konduktivitas arus hingga ${peakBahaya} µA`
             }, ...h]);
           }
         }

@@ -47,7 +47,6 @@ export default function Dashboard() {
   // Format data for display
   const displayArus = currentData?.arus !== null ? currentData?.arus : '--';
   const displayTegangan = currentData?.tegangan !== null ? currentData?.tegangan : '--';
-  const displayDeltaI = currentData?.deltaI !== null ? currentData?.deltaI : '--';
 
   const handleFinishTest = () => {
     pauseSimulation();
@@ -143,10 +142,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 gap-4 md:col-span-1 h-32 md:h-full min-h-[160px]">
               <Card className="bg-[#525252] border-none text-white p-4 rounded-2xl flex flex-col justify-center">
                 <div className="flex justify-between items-start">
-                  <div className="text-sm font-semibold text-neutral-300 mb-2">Arus Listrik</div>
-                  {currentData?.deltaI !== null && (
-                     <div className="text-xs bg-black/30 px-2 py-1 rounded">ΔI: {displayDeltaI} µA</div>
-                  )}
+                  <div className="text-sm font-semibold text-neutral-300 mb-2">Arus Puncak (Peak)</div>
                 </div>
                 <div className="text-4xl font-bold text-sky-400 flex items-baseline gap-1 mt-2">
                   {displayArus} <span className="text-xl font-bold text-white">µA</span>
@@ -193,7 +189,6 @@ export default function Dashboard() {
                       <TableHead className="text-neutral-300">Waktu</TableHead>
                       <TableHead className="text-neutral-300">Status</TableHead>
                       <TableHead className="text-neutral-300 text-right">Puncak Arus</TableHead>
-                      <TableHead className="text-neutral-300 text-right">Delta I</TableHead>
                       <TableHead className="text-neutral-300">Keterangan</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -207,7 +202,6 @@ export default function Dashboard() {
                           </span>
                         </TableCell>
                         <TableCell className="text-right">{record.peakArus} µA</TableCell>
-                        <TableCell className="text-right font-bold text-sky-400">{record.deltaI} µA</TableCell>
                         <TableCell className="text-xs">{record.description}</TableCell>
                       </TableRow>
                     ))}
@@ -303,13 +297,13 @@ export default function Dashboard() {
                 <>
                   <AlertCircle className="w-16 h-16 text-[#ef4444] mb-4" />
                   <h3 className="text-2xl font-bold text-[#ef4444]">Bahaya (Salmonella Terdeteksi)</h3>
-                  <p className="text-sm mt-2 opacity-90">Delta I melebihi batas toleransi. Ditemukan potensi cemaran bakteri.</p>
+                  <p className="text-sm mt-2 opacity-90">Arus puncak melebihi batas toleransi. Ditemukan potensi cemaran bakteri.</p>
                 </>
               ) : (
                 <>
                   <ShieldCheck className="w-16 h-16 text-[#22c55e] mb-4" />
                   <h3 className="text-2xl font-bold text-[#22c55e]">Aman (Salmonella Tidak Terdeteksi)</h3>
-                  <p className="text-sm mt-2 opacity-90">Delta I normal. Tidak ada indikasi cemaran bakteri yang signifikan.</p>
+                  <p className="text-sm mt-2 opacity-90">Arus stabil di titik rendah. Tidak ada indikasi cemaran bakteri yang signifikan.</p>
                 </>
               )}
             </div>
