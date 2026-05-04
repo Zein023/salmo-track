@@ -17,6 +17,7 @@ export function useSensorData() {
   const [historyRecords, setHistoryRecords] = useState<HistoryRecord[]>([]);
   
   const currentPeakRef = useRef(0);
+  const hasLoggedRef = useRef(false);
 
   const connect = () => {
     setStatus('connecting');
@@ -78,29 +79,14 @@ export function useSensorData() {
           internalStatus = nextStatus;
           setStatus(nextStatus);
           setChartData([]); // Clear chart data to start drawing a new sweep
+          hasLoggedRef.current = false; // reset logging flag for the new cycle
           
           if (nextStatus === 'waiting') {
             currentPeakRef.current = 0;
           } else if (nextStatus === 'active-negative') {
-            const peak = Number((0.5 + Math.random() * 2.0).toFixed(2));
-            currentPeakRef.current = peak;
-            setHistoryRecords(h => [{
-              id: Date.now().toString(),
-              time: new Date().toLocaleTimeString(),
-              status: 'Aman',
-              peakArus: peak,
-              description: `Aman (Arus stabil di titik rendah: ${peak} µA)`
-            }, ...h]);
+            currentPeakRef.current = Number((0.5 + Math.random() * 2.0).toFixed(2));
           } else if (nextStatus === 'active-positive') {
-            const peak = Number((15 + Math.random() * 20.0).toFixed(2));
-            currentPeakRef.current = peak;
-            setHistoryRecords(h => [{
-              id: Date.now().toString(),
-              time: new Date().toLocaleTimeString(),
-              status: 'Bahaya',
-              peakArus: peak,
-              description: `Bahaya! Terjadi lonjakan konduktivitas arus hingga ${peak} µA`
-            }, ...h]);
+            currentPeakRef.current = Number((15 + Math.random() * 20.0).toFixed(2));
           }
         }
 
@@ -116,6 +102,32 @@ export function useSensorData() {
         
         setCurrentData(newData);
         setChartData(prev => [...prev, newData]);
+
+        // --- Reactive History Logic ---
+        
+        // Log Bahaya dynamically as soon as threshold is crossed (arus > 5)
+        if (internalStatus === 'active-positive' && newData.arus !== null && newData.arus > 5 && !hasLoggedRef.current) {
+          setHistoryRecords(h => [{
+            id: Date.now().toString(),
+            time: new Date().toLocaleTimeString(),
+            status: 'Bahaya',
+            peakArus: currentPeakRef.current,
+            description: `Bahaya! Terjadi lonjakan arus menembus ambang batas (Puncak: ${currentPeakRef.current} µA)`
+          }, ...h]);
+          hasLoggedRef.current = true;
+        }
+        
+        // Log Aman only at the very end of the active-negative scan (when tick reaches 49, right before transitioning to active-positive)
+        if (internalStatus === 'active-negative' && tick === 49 && !hasLoggedRef.current) {
+          setHistoryRecords(h => [{
+            id: Date.now().toString(),
+            time: new Date().toLocaleTimeString(),
+            status: 'Aman',
+            peakArus: currentPeakRef.current,
+            description: `Aman (Hasil pemindaian final stabil di titik rendah: ${currentPeakRef.current} µA)`
+          }, ...h]);
+          hasLoggedRef.current = true;
+        }
 
       }, 200); // 200ms tick for smooth graph rendering
     }

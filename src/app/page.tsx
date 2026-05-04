@@ -41,8 +41,14 @@ export default function Dashboard() {
   const isDisconnected = status === 'disconnected';
   const isConnecting = status === 'connecting';
   const isWaiting = status === 'waiting';
-  const isActiveNegative = status === 'active-negative';
-  const isActivePositive = status === 'active-positive';
+  
+  // Reactive UI State
+  const isScanning = status === 'active-negative' || status === 'active-positive';
+  const hasSpiked = (currentData?.arus ?? 0) > 5;
+  
+  const showWaiting = isWaiting;
+  const showNegative = isScanning && !hasSpiked;
+  const showPositive = isScanning && hasSpiked;
 
   // Format data for display
   const displayArus = currentData?.arus !== null ? currentData?.arus : '--';
@@ -100,30 +106,30 @@ export default function Dashboard() {
         )}
 
         {/* State: Dashboard Grid (Waiting, Negative, Positive) */}
-        {(isWaiting || isActiveNegative || isActivePositive) && (
+        {(showWaiting || showNegative || showPositive) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full">
             
             {/* Status Block */}
             <div className="md:col-span-1">
-              {isWaiting && (
+              {showWaiting && (
                 <Card className="bg-neutral-500 border-none text-white overflow-hidden rounded-2xl flex flex-col items-center justify-center p-8 text-center h-48 md:h-full min-h-[200px]">
                   <Hourglass className="w-16 h-16 text-neutral-300 mb-4 animate-pulse" />
                   <h2 className="text-2xl font-bold">Menunggu Deteksi</h2>
                   <p className="text-sm font-medium opacity-80 mt-2 italic">Kalibrasi Baseline...</p>
                 </Card>
               )}
-              {isActiveNegative && (
+              {showNegative && (
                 <Card className="bg-[#22c55e] border-none text-white overflow-hidden rounded-2xl h-48 md:h-full min-h-[200px] flex flex-col">
                   <div className="flex-1 flex items-center gap-4 p-6">
                     <ShieldCheck className="w-16 h-16 text-white" />
-                    <h2 className="text-3xl font-bold leading-tight">Salmonella Tidak Terdeteksi !</h2>
+                    <h2 className="text-3xl font-bold leading-tight">Pemindaian Aman...</h2>
                   </div>
                   <div className="bg-black/20 w-full py-3 text-center text-sm font-bold italic">
-                    Terakhir Update: {new Date().toLocaleTimeString()}
+                    Memantau potensi cemaran bakteri
                   </div>
                 </Card>
               )}
-              {isActivePositive && (
+              {showPositive && (
                 <Card className="bg-[#ef4444] border-none text-white overflow-hidden rounded-2xl h-48 md:h-full min-h-[200px] flex flex-col">
                   <div className="flex-1 flex items-center gap-4 p-6">
                     <div className="bg-white rounded-full p-2 shrink-0">
@@ -213,7 +219,7 @@ export default function Dashboard() {
         </Dialog>
         
         {/* Center action button */}
-        {(isActiveNegative || isActivePositive) && (
+        {(showNegative || showPositive) && (
           <button 
             onClick={handleFinishTest}
             className="bg-[#22c55e] text-black w-32 h-14 rounded-full flex items-center justify-center hover:bg-[#1ea34d] transition shadow-[0_0_15px_rgba(34,197,94,0.3)]"
@@ -229,7 +235,7 @@ export default function Dashboard() {
         )}
 
         {isDisconnected && <div className="w-32"></div>}
-        {isWaiting && <div className="w-32"></div>}
+        {showWaiting && <div className="w-32"></div>}
 
         {/* Settings Button (Dialog) */}
         <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
@@ -292,8 +298,8 @@ export default function Dashboard() {
           </DialogHeader>
           
           <div className="py-6 flex flex-col gap-6">
-            <div className={`p-6 rounded-2xl flex flex-col items-center justify-center text-center ${isActivePositive ? 'bg-[#ef4444]/20 border border-[#ef4444]' : 'bg-[#22c55e]/20 border border-[#22c55e]'}`}>
-              {isActivePositive ? (
+            <div className={`p-6 rounded-2xl flex flex-col items-center justify-center text-center ${showPositive ? 'bg-[#ef4444]/20 border border-[#ef4444]' : 'bg-[#22c55e]/20 border border-[#22c55e]'}`}>
+              {showPositive ? (
                 <>
                   <AlertCircle className="w-16 h-16 text-[#ef4444] mb-4" />
                   <h3 className="text-2xl font-bold text-[#ef4444]">Bahaya (Salmonella Terdeteksi)</h3>
