@@ -77,7 +77,7 @@ export default function Dashboard() {
 
       {/* Top Header */}
       <header className="flex items-center gap-3 pt-6 pb-12 justify-center md:justify-start">
-        <Hexagon className="text-orange-500 fill-blue-600 w-8 h-8" />
+        <img src="/logoPolban.png" alt="Logo Polban" className="w-10 h-10 object-contain" />
         <h1 className="text-2xl font-bold tracking-tight">SalmoTrack</h1>
       </header>
 
